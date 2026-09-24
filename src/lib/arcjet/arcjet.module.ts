@@ -2,12 +2,12 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import {
-  ArcjetGuard,
   ArcjetModule as ArcjetSdkModule,
   detectBot,
   shield,
   slidingWindow,
 } from '@arcjet/nest';
+import { ArcjetGuard } from '../../common/guards/arcjet.guard';
 import { ArcjetService } from './arcjet.service';
 
 @Global()
@@ -18,7 +18,7 @@ import { ArcjetService } from './arcjet.service';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         key: config.getOrThrow<string>('ARCJET_KEY'),
-        // Default rules for every route. Add per-route rules with @WithArcjetRules().
+        // Default rules for every route. Add per-route rules with @ArcjetRules().
         rules: [
           shield({ mode: 'LIVE' }),
           // DRY_RUN: this is an API, so non-browser clients are legitimate.
