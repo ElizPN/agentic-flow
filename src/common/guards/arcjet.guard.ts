@@ -8,7 +8,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import type { Request } from 'express';
+import type { Request, Response } from 'express';
 import type { Primitive, Product } from '@arcjet/nest';
 import { ARCJET_RULES } from '../decorators/arcjet-rules.decorator';
 import { ArcjetService } from '../../lib/arcjet/arcjet.service';
@@ -47,6 +47,8 @@ export class ArcjetGuard implements CanActivate {
 
     if (decision.isDenied()) {
       if (decision.reason.isRateLimit()) {
+        const res = context.switchToHttp().getResponse<Response>();
+        res.setHeader('Retry-After', Math.max(1, decision.reason.reset));
         throw new HttpException(
           'Too many requests',
           HttpStatus.TOO_MANY_REQUESTS,
